@@ -1,24 +1,33 @@
-import React, { useState, useEffect } from 'react';
-// import { Form, Field, withFormik } from 'formik';
+import React, { useState } from 'react';
 import { axiosWithAuth } from '../utils/axiosWithAuth';
 
 const Login = (props) => {
 
- const [credentials, setCredentials] = useState({});
+    //set local state here, pass username and password as empty strings to initialize
+ const [credentials, setCredentials] = useState({
+     username: '',
+     password: ''
+ });
 
+    //set up login event passing the custom axios call
     const login = e =>{
         e.preventDefault();
         axiosWithAuth()
         .post('/login', credentials)
-        .then(res => console.log(res))
+        .then(res => {
+            console.log(res);
+            localStorage.setItem('token', res.data.payload);
+            props.history.push('/friends');            
+            })
         .catch(err => console.log(err))
     }
-
-    const handleChange = e => {
-        setCredentials: {
-            credentials: {[e.target.name] = e.target.value}
-            
-        }
+    
+    //set up change handler, spread in the credentials, which pass in the username and passwords
+    const handleChange = (e)=> {
+       setCredentials({
+           ...credentials,
+           [e.target.name]: e.target.value
+       })
     }
     
    return(
@@ -28,8 +37,7 @@ const Login = (props) => {
                 <input
                     component="input"
                     type="text"
-                    name="userName"
-                    value={credentials.userName}
+                    name="username"
                     placeholder="User Name"
                     onChange={handleChange}
                     />
@@ -37,7 +45,6 @@ const Login = (props) => {
                     component="input"
                     type="password"
                     name="password"
-                    value={credentials.password}
                     placeholder="Password"
                     onChange={handleChange}
                     />
